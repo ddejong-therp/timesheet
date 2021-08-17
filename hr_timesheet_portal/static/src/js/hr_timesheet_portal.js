@@ -7,6 +7,8 @@ odoo.define("hr_timesheet_portal", function(require) {
     var sAnimation = require("website.content.snippets.animation");
     var rpc = require("web.rpc");
     var core = require("web.core");
+    var session = require('web.session');
+    
     var _t = core._t;
 
     sAnimation.registry.hr_timesheet_portal = sAnimation.Widget.extend({
@@ -29,19 +31,30 @@ odoo.define("hr_timesheet_portal", function(require) {
 
         _onclick_delete: function(e) {
             e.stopPropagation();
-            rpc.query({
-                model: "account.analytic.line",
-                method: "unlink",
-                args: [
-                    [
-                        jQuery(e.currentTarget)
-                            .parents("tr")
-                            .data("line-id"),
-                    ],
-                ],
-            })
-                .then(this.proxy("_reload_timesheet"))
-                .catch(this.proxy("_display_failure"));
+
+            var line = jQuery(e.target).parents("tr")
+            var line_user_id = line.data("user-id")
+
+            if (line_user_id == session.user_id) {
+                var line_name = line.find('td[data-field-name="name"]').text()
+
+                if (confirm(_t(`Are you sure you want to remove line "${line_name}"?`))) {
+
+                    rpc.query({
+                        model: "account.analytic.line",
+                        method: "unlink",
+                        args: [
+                            [
+                                jQuery(e.currentTarget)
+                                    .parents("tr")
+                                    .data("line-id"),
+                            ],
+                        ],
+                    })
+                        .then(this.proxy("_reload_timesheet"))
+                        .catch(this.proxy("_display_failure"));
+                }
+            }
         },
 
         _onclick_add: function() {
@@ -70,11 +83,10 @@ odoo.define("hr_timesheet_portal", function(require) {
         },
 
         _onclick_edit: function(e) {
-            return this._edit_line(
-                jQuery(e.target)
-                    .parents("tr")
-                    .data("line-id")
-            );
+            var line = jQuery(e.target).parents("tr")
+
+            if (line.data('user-id') == session.user_id)
+                return this._edit_line(line.data("line-id"));
         },
 
         _onclick_submit: function(e) {
