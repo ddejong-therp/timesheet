@@ -16,7 +16,7 @@ odoo.define("hr_timesheet_portal", function(require) {
         events: {
             "click h5": "_onclick_add",
             "click tr[data-line-id]:not(.edit)": "_onclick_edit",
-            "click i.fa-remove": "_onclick_delete",
+            "click .fa-remove": "_onclick_delete",
             "click button.submit": "_onclick_submit",
             "submit form": "_onclick_submit",
             "click button.cancel": "_reload_timesheet",
@@ -152,7 +152,7 @@ odoo.define("hr_timesheet_portal", function(require) {
                 }),
                 $submit = jQuery('<button class="btn btn-primary submit">'),
                 $cancel = jQuery('<button class="btn cancel" type="reset">');
-            $edit_line.children("td:last-child").append($form);
+            $edit_line.children("td:last-child").prepend($form);
             $submit.text(_t("Submit"));
             $cancel.text(_t("Cancel"));
             $form.append($submit, $cancel);
