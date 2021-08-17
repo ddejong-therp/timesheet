@@ -125,10 +125,7 @@ odoo.define("hr_timesheet_portal", function(require) {
 
         _display_failure: function(error) {
             this.$el.prepend(
-                jQuery('<div class="alert alert-danger">').text(error.data.message)
-            );
-            this.$el.prepend(
-                jQuery('<div class="alert alert-danger">').text(error.message)
+                jQuery('<div class="alert alert-danger">').text(`[${error.message.message}]: ${error.message.data.message}`)
             );
         },
 
