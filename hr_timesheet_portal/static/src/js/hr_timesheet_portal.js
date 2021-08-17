@@ -18,7 +18,7 @@ odoo.define("hr_timesheet_portal", function(require) {
             "click tr[data-line-id]:not(.edit)": "_onclick_edit",
             "click .fa-remove": "_onclick_delete",
             "click button.submit": "_onclick_submit",
-            "submit form": "_onclick_submit",
+            "submit form#hr_timesheet_portal": "_onclick_submit",
             "click button.cancel": "_reload_timesheet",
         },
 
