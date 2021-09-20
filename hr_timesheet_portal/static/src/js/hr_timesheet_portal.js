@@ -91,12 +91,24 @@ odoo.define("hr_timesheet_portal", function(require) {
 
         _onclick_submit: function(e) {
             e.preventDefault();
-            var $tr = jQuery(e.target).parents("tr"),
-                data = _.object(
-                    _.map($tr.find("form").serializeArray(), function(a) {
-                        return [a.name, a.value];
-                    })
-                );
+
+            var $tr = jQuery(e.target).parents("tr")
+            var $form = $tr.find("form")
+
+            var valid = true
+            $tr.find("input[type='time-duration']").each((i, el) => {
+
+                if (!this._verify_time_duration(el.value)) {
+                    alert(_t('Time duration has invalid format'))
+                    valid = false
+                }
+            })
+            if (!valid) return
+
+            var data = _.object(_.map($form.serializeArray(), function(a) {
+                    return [a.name, a.value];
+                })
+            );
             return rpc
                 .query({
                     model: "account.analytic.line",
@@ -129,7 +141,7 @@ odoo.define("hr_timesheet_portal", function(require) {
             );
         },
 
-        _edit_line(line_id) {
+        _edit_line: function(line_id) {
             var $line = this.$(_.str.sprintf("tr[data-line-id=%s]", line_id)),
                 $edit_line = $line.clone();
             this.$("tbody tr.edit").remove();
@@ -159,6 +171,17 @@ odoo.define("hr_timesheet_portal", function(require) {
             $edit_line.find("input:first").focus();
             $line.hide();
         },
+
+        _verify_time_duration: (string) => {
+            var i = string.search(':')
+
+            if (i == -1)    return false
+
+            var j = string.substring(i+1).search(':')
+            if (j != -1)    return false
+
+            return true
+        }
     });
     return {hr_timesheet_portal: sAnimation.registry.hr_timesheet_portal};
 });
