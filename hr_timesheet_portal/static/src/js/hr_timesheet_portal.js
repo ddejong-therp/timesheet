@@ -144,29 +144,33 @@ odoo.define("hr_timesheet_portal", function(require) {
         _edit_line: function(line_id) {
             var $line = this.$(_.str.sprintf("tr[data-line-id=%s]", line_id)),
                 $edit_line = $line.clone();
+                
             this.$("tbody tr.edit").remove();
             this.$("tbody tr").show();
             $line.before($edit_line);
             $edit_line.children("[data-field-name]").each(function() {
-                var $this = jQuery(this),
-                    $input = jQuery("<input>", {
-                        class: "form-control",
-                        type: $this.data("field-type") || "text",
-                        value: $this.data("field-value") || $this.text(),
-                        form: "hr_timesheet_portal_form",
-                        name: $this.data("field-name"),
-                    });
+                var $this = jQuery(this)
+
+                var attrs = {
+                    class: "form-control",
+                    type: $this.data("field-type") || "text",
+                    value: $this.data("field-value") || $this.text(),
+                    form: "hr_timesheet_portal_form",
+                    name: $this.data("field-name")
+                };
+                if (attrs.type == 'time-duration')
+                    attrs.style = 'max-width: 70px;'
+
+                var $input = jQuery("<input>", attrs);
                 $this.empty().append($input);
             });
             $edit_line.addClass("edit");
             var $form = jQuery("<form>", {
                     id: "hr_timesheet_portal_form",
                 }),
-                $submit = jQuery('<button class="btn btn-primary submit">'),
-                $cancel = jQuery('<button class="btn cancel" type="reset">');
+                $submit = jQuery('<button class="btn btn-primary submit fa fa-save">'),
+                $cancel = jQuery('<button class="btn cancel fa fa-ban" type="reset">');
             $edit_line.children("td:last-child").prepend($form);
-            $submit.text(_t("Submit"));
-            $cancel.text(_t("Cancel"));
             $form.append($submit, $cancel);
             $edit_line.find("input:first").focus();
             $line.hide();
